@@ -11,7 +11,7 @@ replace (
 
 require (
 	github.com/charlievieth/fastwalk v1.0.1
-	github.com/foomo/posh v0.1.3
+	github.com/foomo/posh v0.1.4
 	github.com/foomo/posh/provider/onepassword v0.0.0-00010101000000-000000000000
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/viper v1.14.0
