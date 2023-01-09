@@ -17,6 +17,7 @@ import (
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/require"
+	"github.com/foomo/posh/provider/gotsrpc"
 	"github.com/foomo/posh/provider/onepassword"
 	"github.com/spf13/viper"
 )
@@ -40,6 +41,7 @@ func New(l log.Logger) (plugin.Plugin, error) {
 
 	// add commands
 	inst.commands.Add(
+		gotsrpc.NewCommand(l, inst.c),
 		pkgcommand.NewGo(l, inst.c),
 		command.NewCache(l, inst.c),
 		command.NewExit(l),
@@ -102,10 +104,17 @@ func (p *Plugin) Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	if c := p.commands.Get(r.Cmd()); c == nil {
+	if cmd := p.commands.Get(r.Cmd()); cmd == nil {
 		return fmt.Errorf("invalid [cmd] argument: %s", r.Cmd())
-	} else if err := c.Execute(ctx, r); err != nil {
-		return err
+	} else {
+		if value, ok := cmd.(command.Validator); ok {
+			if err := value.Validate(ctx, r); err != nil {
+				return err
+			}
+		}
+		if err := cmd.Execute(ctx, r); err != nil {
+			return err
+		}
 	}
 
 	return nil

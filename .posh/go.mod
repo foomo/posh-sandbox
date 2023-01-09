@@ -5,13 +5,15 @@ go 1.19
 replace (
 	github.com/c-bata/go-prompt v0.2.6 => github.com/franklinkim/go-prompt v0.2.7-0.20210427061716-a8f4995d7aa5
 	github.com/foomo/posh => ../../posh
+	github.com/foomo/posh/provider/gotsrpc => ../../posh-providers/gotsrpc
 	github.com/foomo/posh/provider/onepassword => ../../posh-providers/onepassword
 	github.com/foomo/posh/provider/zeus => ../../posh-providers/zeus
 )
 
 require (
 	github.com/c-bata/go-prompt v0.2.6
-	github.com/foomo/posh v0.1.4
+	github.com/foomo/posh v0.1.5
+	github.com/foomo/posh/provider/gotsrpc v0.0.0-00010101000000-000000000000
 	github.com/foomo/posh/provider/onepassword v0.0.0-00010101000000-000000000000
 	github.com/spf13/viper v1.14.0
 )
