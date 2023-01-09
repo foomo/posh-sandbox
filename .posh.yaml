@@ -61,7 +61,7 @@ require:
     ## Example: require 1Password account
     - name: op
       command: |
-        [[ $(op account --account ff get 2>&1) =~ "found no account" ]] && exit 1 || exit 0
+        [[ $(op account --account bestbytes get 2>&1) =~ "found no account" ]] && exit 1 || exit 0
       help: |
         You're 1Password account is not registered yet! Please do so by running:
 

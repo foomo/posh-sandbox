@@ -17,6 +17,11 @@ brew:
 shell: require brew
 	@posh prompt
 
+.PHONY: shell.debug
+## Start the interactive
+shell.debug: require brew
+	@posh prompt --level debug
+
 ## === Utils ===
 
 ## Show help text
