@@ -33,6 +33,14 @@ jobs:
         gomod: ${{ fromJson(needs.matrix.outputs.gomod) }}
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        with:
+          repository: 'foomo/posh'
+          path: ${{github.workspace}}/posh/
+      - uses: actions/checkout@v3
+        with:
+          repository: 'foomo/posh-providers'
+          path: ${{github.workspace}}/posh-providers/
       - uses: actions/setup-go@v3
         with:
           go-version-file: '${{ matrix.gomod }}/go.mod'
