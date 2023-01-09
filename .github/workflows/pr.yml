@@ -44,10 +44,10 @@ jobs:
           path: posh-providers
           repository: 'foomo/posh-providers'
       - uses: actions/setup-go@v3
+        working-directory: posh-sandbox/${{ matrix.gomod }}
         with:
-          go-version-file: 'posh-sandbox/${{ matrix.gomod }}/go.mod'
+          go-version-file: go.mod
       - uses: golangci/golangci-lint-action@v3
-        with:
-          working-directory: posh-sandbox/${{ matrix.gomod }}
+        working-directory: posh-sandbox/${{ matrix.gomod }}
       - run: go test -v ./...
         working-directory: posh-sandbox/${{ matrix.gomod }}
