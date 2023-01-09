@@ -33,31 +33,21 @@ jobs:
         gomod: ${{ fromJson(needs.matrix.outputs.gomod) }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          path: posh-sandbox
       - uses: actions/checkout@v3
         with:
+          path: posh
           repository: 'foomo/posh'
-          path: ${{github.workspace}}/posh/
       - uses: actions/checkout@v3
         with:
+          path: posh-providers
           repository: 'foomo/posh-providers'
-          path: ${{github.workspace}}/posh-providers/
       - uses: actions/setup-go@v3
         with:
-          go-version-file: '${{ matrix.gomod }}/go.mod'
+          go-version-file: 'posh-sandbox/${{ matrix.gomod }}/go.mod'
       - uses: golangci/golangci-lint-action@v3
         with:
-          working-directory: ${{ matrix.gomod }}
-  test:
-    name: test
-    needs: matrix
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        gomod: ${{ fromJson(needs.matrix.outputs.gomod) }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: '${{ matrix.gomod }}/go.mod'
+          working-directory: posh-sandbox/${{ matrix.gomod }}
       - run: go test -v ./...
-        working-directory: ${{ matrix.gomod }}
+        working-directory: posh-sandbox/${{ matrix.gomod }}
