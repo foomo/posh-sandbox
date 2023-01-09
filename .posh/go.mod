@@ -10,10 +10,9 @@ replace (
 )
 
 require (
-	github.com/charlievieth/fastwalk v1.0.1
+	github.com/c-bata/go-prompt v0.2.6
 	github.com/foomo/posh v0.1.4
 	github.com/foomo/posh/provider/onepassword v0.0.0-00010101000000-000000000000
-	github.com/pkg/errors v0.9.1
 	github.com/spf13/viper v1.14.0
 )
 
@@ -23,7 +22,7 @@ require (
 	github.com/1Password/connect-sdk-go v1.5.0 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/alecthomas/chroma v0.10.0 // indirect
-	github.com/c-bata/go-prompt v0.2.6 // indirect
+	github.com/charlievieth/fastwalk v1.0.1 // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/foomo/fender v0.4.4 // indirect
@@ -46,6 +45,7 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/term v1.1.0 // indirect
 	github.com/pterm/pterm v0.12.51 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect

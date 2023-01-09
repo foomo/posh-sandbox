@@ -1,0 +1,229 @@
+package command
+
+import (
+	"context"
+
+	prompt2 "github.com/c-bata/go-prompt"
+	"github.com/foomo/posh/pkg/cache"
+	"github.com/foomo/posh/pkg/command/tree"
+	"github.com/foomo/posh/pkg/log"
+	"github.com/foomo/posh/pkg/prompt"
+	"github.com/foomo/posh/pkg/readline"
+	"github.com/foomo/posh/pkg/shell"
+	"github.com/foomo/posh/pkg/util/files"
+	"github.com/foomo/posh/pkg/util/suggests"
+)
+
+// Go command
+type Go struct {
+	l           log.Logger
+	cache       cache.Namespace
+	commandTree *tree.Root
+}
+
+// ------------------------------------------------------------------------------------------------
+// ~ Constructor
+// ------------------------------------------------------------------------------------------------
+
+// NewGo command
+func NewGo(l log.Logger, cache cache.Cache) *Go {
+	inst := &Go{
+		l:     l,
+		cache: cache.Get("gomod"),
+	}
+
+	pathModArg := &tree.Arg{
+		Name:     "path",
+		Optional: true,
+		Suggest: func(ctx context.Context, p *tree.Root, r *readline.Readline) []prompt2.Suggest {
+			return inst.completePaths(ctx, "go.mod")
+		},
+	}
+
+	pathGenerateArg := &tree.Arg{
+		Name:     "path",
+		Optional: true,
+		Suggest: func(ctx context.Context, p *tree.Root, r *readline.Readline) []prompt2.Suggest {
+			return inst.completePaths(ctx, "generate.go")
+		},
+	}
+
+	inst.commandTree = &tree.Root{
+		Name: "go",
+		Nodes: tree.Nodes{
+			{
+				Name:        "mod",
+				Description: "run go mod commands",
+				Nodes: tree.Nodes{
+					{
+						Name:        "tidy", // docker prod stae
+						Description: "run go mod tidy",
+						Args:        []*tree.Arg{pathModArg},
+						Execute:     inst.modTidy,
+					},
+					{
+						Name:        "download",
+						Description: "run go mod download",
+						Args:        []*tree.Arg{pathModArg},
+						Execute:     inst.modDownload,
+					},
+					{
+						Name:        "outdated",
+						Description: "show go mod outdated",
+						Args:        []*tree.Arg{pathModArg},
+						Execute:     inst.modOutdated,
+					},
+				},
+			},
+			{
+				Name:        "generate",
+				Description: "run go mod download",
+				Args:        []*tree.Arg{pathGenerateArg},
+				Execute:     inst.generate,
+			},
+		},
+	}
+	return inst
+}
+
+// ------------------------------------------------------------------------------------------------
+// ~ Public methods
+// ------------------------------------------------------------------------------------------------
+
+func (c *Go) Name() string {
+	return c.commandTree.Name
+}
+
+func (c *Go) Description() string {
+	return "run go mod"
+}
+
+func (c *Go) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest {
+	return c.commandTree.Complete(ctx, r)
+}
+
+func (c *Go) Execute(ctx context.Context, r *readline.Readline) error {
+	return c.commandTree.Execute(ctx, r)
+}
+
+func (c *Go) Help() string {
+	return `Looks for go.mod files and runs the given command.
+
+Usage:
+  gomod [command] <path>
+
+Available commands:
+  tidy       run go mod tidy on specific or all paths
+  download   run go mod download on specific or all paths
+  outdated   list outdated packages on specific or all paths
+
+Examples:
+  gomod tidy ./path
+`
+}
+
+// ------------------------------------------------------------------------------------------------
+// ~ Private methods
+// ------------------------------------------------------------------------------------------------
+
+func (c *Go) modTidy(ctx context.Context, r *readline.Readline) error {
+	var paths []string
+	if r.Args().HasIndex(2) {
+		paths = []string{r.Args().At(2)}
+	} else {
+		paths = c.paths(ctx, "go.mod")
+	}
+	for _, value := range paths {
+		c.l.Info("go mod tidy:", value)
+		if err := shell.New(ctx, c.l,
+			"go", "mod", "tidy",
+		).
+			Args(r.AdditionalArgs()...).
+			Dir(value).
+			Run(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Go) modDownload(ctx context.Context, r *readline.Readline) error {
+	var paths []string
+	if r.Args().HasIndex(2) {
+		paths = []string{r.Args().At(2)}
+	} else {
+		paths = c.paths(ctx, "go.mod")
+	}
+	for _, value := range paths {
+		c.l.Info("go mod download:", value)
+		if err := shell.New(ctx, c.l,
+			"go", "mod", "tidy",
+		).
+			Args(r.AdditionalArgs()...).
+			Dir(value).
+			Run(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Go) modOutdated(ctx context.Context, r *readline.Readline) error {
+	var paths []string
+	if r.Args().HasIndex(2) {
+		paths = []string{r.Args().At(2)}
+	} else {
+		paths = c.paths(ctx, "go.mod")
+	}
+	for _, value := range paths {
+		c.l.Info("go mod outdated:", value)
+		if err := shell.New(ctx, c.l,
+			"go", "list",
+			"-u", "-m", "-json", "all",
+			"|", "go-mod-outdated", "-update", "-direct",
+		).
+			Args(r.AdditionalArgs()...).
+			Dir(value).
+			Run(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Go) generate(ctx context.Context, r *readline.Readline) error {
+	var paths []string
+	if r.Args().HasIndex(2) {
+		paths = append(paths, r.Args().At(2))
+	} else {
+		paths = c.paths(ctx, "generate.go")
+	}
+
+	for _, value := range paths {
+		c.l.Info("go generate:", value)
+		if err := shell.New(ctx, c.l,
+			"go", "generate", value,
+		).
+			Args(r.AdditionalArgs()...).
+			Run(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Go) completePaths(ctx context.Context, filename string) []prompt.Suggest {
+	return suggests.List(c.paths(ctx, filename))
+}
+
+//nolint:forcetypeassert
+func (c *Go) paths(ctx context.Context, filename string) []string {
+	return c.cache.Get("paths-"+filename, func() any {
+		if value, err := files.Find(ctx, filename); err != nil {
+			c.l.Debug("failed to walk files", err.Error())
+			return nil
+		} else {
+			return value
+		}
+	}).([]string)
+}

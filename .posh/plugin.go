@@ -40,8 +40,7 @@ func New(l log.Logger) (plugin.Plugin, error) {
 
 	// add commands
 	inst.commands.Add(
-		pkgcommand.NewGoMod(l, inst.c),
-		pkgcommand.NewGoGenerate(l, inst.c),
+		pkgcommand.NewGo(l, inst.c),
 		command.NewCache(l, inst.c),
 		command.NewExit(l),
 		command.NewHelp(l, inst.commands),
@@ -118,6 +117,7 @@ func (p *Plugin) Prompt(ctx context.Context, cfg config.Prompt) error {
 		prompt.WithPrefix(cfg.Prefix),
 		prompt.WithContext(ctx),
 		prompt.WithCommands(p.commands),
+		prompt.WithAliases(cfg.Aliases),
 		prompt.WithCheckers(
 			func(ctx context.Context, l log.Logger) check.Info {
 				return check.Info{
