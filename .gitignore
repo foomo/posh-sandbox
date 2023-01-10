@@ -6,6 +6,7 @@ tmp/
 *.log
 !.posh
 !.posh.yaml
+!.posh.override.yaml
 !.github
 !.gitignore
 !.editorconfig

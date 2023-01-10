@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/foomo/posh-providers/dreadl0ck/zeus"
+	"github.com/foomo/posh-providers/foomo/gotsrpc"
+	"github.com/foomo/posh-providers/onepassword"
 	pkgcommand "github.com/foomo/posh-sandbox/posh/pkg/command"
 	"github.com/foomo/posh/integration/ownbrew"
 	"github.com/foomo/posh/pkg/cache"
@@ -17,8 +20,6 @@ import (
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/require"
-	"github.com/foomo/posh/provider/gotsrpc"
-	"github.com/foomo/posh/provider/onepassword"
 	"github.com/spf13/viper"
 )
 
@@ -42,14 +43,18 @@ func New(l log.Logger) (plugin.Plugin, error) {
 	// add commands
 	inst.commands.Add(
 		gotsrpc.NewCommand(l, inst.c),
+		zeus.NewCommand(l, inst.c),
 		pkgcommand.NewGo(l, inst.c),
+		pkgcommand.NewPrint(l),
 		command.NewCache(l, inst.c),
 		command.NewExit(l),
 		command.NewHelp(l, inst.commands),
 	)
 
 	// Welcome
-	if cmd, err := pkgcommand.NewWelcome(l); err != nil {
+	if cmd, err := pkgcommand.NewWelcome(l,
+		pkgcommand.WelcomeWithConfigKey("welcome"),
+	); err != nil {
 		return nil, err
 	} else {
 		inst.commands.Add(cmd)
@@ -70,6 +75,7 @@ func New(l log.Logger) (plugin.Plugin, error) {
 // ~ Public methods
 // ------------------------------------------------------------------------------------------------
 
+// Brew - $ posh brew => load plugin => call Brew()
 func (p *Plugin) Brew(ctx context.Context, cfg config.Ownbrew) error {
 	brew, err := ownbrew.New(p.l,
 		ownbrew.WithDry(cfg.Dry),

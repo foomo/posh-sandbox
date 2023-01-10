@@ -28,7 +28,7 @@ type Go struct {
 // NewGo command
 func NewGo(l log.Logger, cache cache.Cache) *Go {
 	inst := &Go{
-		l:     l,
+		l:     l.Named("go"),
 		cache: cache.Get("gomod"),
 	}
 
@@ -49,7 +49,8 @@ func NewGo(l log.Logger, cache cache.Cache) *Go {
 	}
 
 	inst.commandTree = &tree.Root{
-		Name: "go",
+		Name:        "go",
+		Description: "go related tasks",
 		Nodes: tree.Nodes{
 			{
 				Name:        "mod",
@@ -95,15 +96,15 @@ func (c *Go) Name() string {
 }
 
 func (c *Go) Description() string {
-	return "run go mod"
+	return c.commandTree.Description
 }
 
 func (c *Go) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest {
-	return c.commandTree.Complete(ctx, r)
+	return c.commandTree.RunCompletion(ctx, r)
 }
 
 func (c *Go) Execute(ctx context.Context, r *readline.Readline) error {
-	return c.commandTree.Execute(ctx, r)
+	return c.commandTree.RunExecution(ctx, r)
 }
 
 func (c *Go) Help() string {

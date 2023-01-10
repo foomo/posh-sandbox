@@ -1,5 +1,5 @@
 module:
   name: github.com/foomo/posh/sandbox
   path: ./go
-targets: []
-mappings: []
+targets: {}
+mappings: {}

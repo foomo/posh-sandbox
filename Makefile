@@ -2,24 +2,27 @@
 
 ## === Tasks ===
 
+.PHONY: config
+## Validate dependencies
+config:
+	@posh config --level debug
+
 .PHONY: require
 ## Validate dependencies
 require:
-	@posh require
+	@echo "require:"
+	@posh require --level debug
 
 .PHONY: brew
 ## Install project specific packages
 brew:
-	@posh brew
+	@echo "brew:"
+	@posh brew --level debug
 
 .PHONY: shell
 ## Start the interactive
 shell: require brew
-	@posh prompt
-
-.PHONY: shell.debug
-## Start the interactive
-shell.debug: require brew
+	@echo "prompt:"
 	@posh prompt --level debug
 
 ## === Utils ===

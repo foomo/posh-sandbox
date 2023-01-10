@@ -1,0 +1,11 @@
+Version: v1.0
+
+## Prompt settings
+prompt:
+  aliases:
+    gomod: go mod
+    gogenerate: go generate
+
+## Example: Custom
+welcome:
+  message: Hi, thanks for using my posh!

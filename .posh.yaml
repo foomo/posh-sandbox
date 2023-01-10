@@ -11,8 +11,10 @@ prompt:
 
 ## Environment variables
 env:
-  PATH: "${PROJECT_ROOT}/bin:${PATH}"
-  GOPROXY: "https://proxy.golang.org,direct"
+  - name: PATH
+    value: "${PROJECT_ROOT}/bin:${PATH}"
+  - name: GOPROXY
+    value: "https://proxy.golang.org,direct"
 
 ## Plugin settings
 plugin:
@@ -25,7 +27,7 @@ ownbrew:
   tapDir: ".posh/scripts/ownbrew"
   tempDir: ".posh/tmp"
   cellarDir: ".posh/bin"
-  packages: []
+  packages:
     ## Remote package
     ## See `https://github.com/foomo/ownbrew-tap`
     # - name: gotsrpc
@@ -33,7 +35,13 @@ ownbrew:
     #   version: 2.6.2
     ## Local package `.posh/scripts/ownbrew`
     # - name: example
-  #   version: 0.0.0
+    #   version: 0.0.0
+    - name: gotsrpc
+      tap: foomo/tap/foomo/gotsrpc
+      version: 2.6.2
+    - name: zeus
+      tap: foomo/tap/dreadl0ck/zeus
+      version: 0.9.11
 
 ## Requirement settings
 require:
