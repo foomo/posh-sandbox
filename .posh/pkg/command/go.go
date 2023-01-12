@@ -2,6 +2,9 @@ package command
 
 import (
 	"context"
+	"os"
+	"path"
+	"strings"
 
 	prompt2 "github.com/c-bata/go-prompt"
 	"github.com/foomo/posh/pkg/cache"
@@ -57,7 +60,7 @@ func NewGo(l log.Logger, cache cache.Cache) *Go {
 				Description: "run go mod commands",
 				Nodes: tree.Nodes{
 					{
-						Name:        "tidy", // docker prod stae
+						Name:        "tidy",
 						Description: "run go mod tidy",
 						Args:        []*tree.Arg{pathModArg},
 						Execute:     inst.modTidy,
@@ -73,6 +76,28 @@ func NewGo(l log.Logger, cache cache.Cache) *Go {
 						Description: "show go mod outdated",
 						Args:        []*tree.Arg{pathModArg},
 						Execute:     inst.modOutdated,
+					},
+				},
+			},
+			{
+				Name:        "work",
+				Description: "manage go.work file",
+				Nodes: tree.Nodes{
+					{
+						Name:        "init",
+						Description: "generate go.work file",
+						Execute:     inst.workInit,
+					},
+					{
+						Name:        "use",
+						Description: "add go.work entry",
+						Args: []*tree.Arg{
+							{
+								Name:    "path",
+								Suggest: nil,
+							},
+						},
+						Execute: inst.workUse,
 					},
 				},
 			},
@@ -140,7 +165,7 @@ func (c *Go) modTidy(ctx context.Context, r *readline.Readline) error {
 			"go", "mod", "tidy",
 		).
 			Args(r.AdditionalArgs()...).
-			Dir(value).
+			Dir(path.Dir(value)).
 			Run(); err != nil {
 			return err
 		}
@@ -161,7 +186,7 @@ func (c *Go) modDownload(ctx context.Context, r *readline.Readline) error {
 			"go", "mod", "tidy",
 		).
 			Args(r.AdditionalArgs()...).
-			Dir(value).
+			Dir(path.Dir(value)).
 			Run(); err != nil {
 			return err
 		}
@@ -190,6 +215,22 @@ func (c *Go) modOutdated(ctx context.Context, r *readline.Readline) error {
 		}
 	}
 	return nil
+}
+
+func (c *Go) workInit(ctx context.Context, r *readline.Readline) error {
+	data := "go 1.19\n\nuse (\n"
+	for _, value := range c.paths(ctx, "go.mod") {
+		data += "\t" + strings.TrimSuffix(value, "/go.mod") + "\n"
+	}
+	data += ")"
+	return os.WriteFile(path.Join(os.Getenv("PROJECT_ROOT"), "go.work"), []byte(data), 0644)
+}
+
+func (c *Go) workUse(ctx context.Context, r *readline.Readline) error {
+	return shell.New(ctx, c.l, "go").
+		Args(r.Args()...).
+		Args(r.AdditionalArgs()...).
+		Run()
 }
 
 func (c *Go) generate(ctx context.Context, r *readline.Readline) error {
