@@ -223,7 +223,7 @@ func (c *Go) workInit(ctx context.Context, r *readline.Readline) error {
 		data += "\t" + strings.TrimSuffix(value, "/go.mod") + "\n"
 	}
 	data += ")"
-	return os.WriteFile(path.Join(os.Getenv("PROJECT_ROOT"), "go.work"), []byte(data), 0644)
+	return os.WriteFile(path.Join(os.Getenv("PROJECT_ROOT"), "go.work"), []byte(data), 0600)
 }
 
 func (c *Go) workUse(ctx context.Context, r *readline.Readline) error {
