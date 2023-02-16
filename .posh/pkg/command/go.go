@@ -10,7 +10,7 @@ import (
 	"github.com/foomo/posh/pkg/cache"
 	"github.com/foomo/posh/pkg/command/tree"
 	"github.com/foomo/posh/pkg/log"
-	"github.com/foomo/posh/pkg/prompt"
+	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/shell"
 	"github.com/foomo/posh/pkg/util/files"
@@ -124,15 +124,15 @@ func (c *Go) Description() string {
 	return c.commandTree.Description
 }
 
-func (c *Go) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest {
-	return c.commandTree.RunCompletion(ctx, r)
+func (c *Go) Complete(ctx context.Context, r *readline.Readline, d goprompt.Document) []goprompt.Suggest {
+	return c.commandTree.Complete(ctx, r)
 }
 
 func (c *Go) Execute(ctx context.Context, r *readline.Readline) error {
-	return c.commandTree.RunExecution(ctx, r)
+	return c.commandTree.Execute(ctx, r)
 }
 
-func (c *Go) Help() string {
+func (c *Go) Help(ctx context.Context, r *readline.Readline) string {
 	return `Looks for go.mod files and runs the given command.
 
 Usage:
@@ -254,14 +254,14 @@ func (c *Go) generate(ctx context.Context, r *readline.Readline) error {
 	return nil
 }
 
-func (c *Go) completePaths(ctx context.Context, filename string) []prompt.Suggest {
+func (c *Go) completePaths(ctx context.Context, filename string) []goprompt.Suggest {
 	return suggests.List(c.paths(ctx, filename))
 }
 
 //nolint:forcetypeassert
 func (c *Go) paths(ctx context.Context, filename string) []string {
 	return c.cache.Get("paths-"+filename, func() any {
-		if value, err := files.Find(ctx, filename); err != nil {
+		if value, err := files.Find(ctx, ".", filename); err != nil {
 			c.l.Debug("failed to walk files", err.Error())
 			return nil
 		} else {

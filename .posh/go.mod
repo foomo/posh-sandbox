@@ -12,7 +12,7 @@ require (
 	github.com/c-bata/go-prompt v0.2.6
 	github.com/foomo/posh v0.2.1
 	github.com/foomo/posh-providers v0.0.0-00010101000000-000000000000
-	github.com/spf13/viper v1.14.0
+	github.com/spf13/viper v1.15.0
 )
 
 require (

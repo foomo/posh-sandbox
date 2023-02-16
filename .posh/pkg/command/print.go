@@ -5,7 +5,7 @@ import (
 
 	"github.com/foomo/posh/pkg/command/tree"
 	"github.com/foomo/posh/pkg/log"
-	"github.com/foomo/posh/pkg/prompt"
+	"github.com/foomo/posh/pkg/prompt/goprompt"
 	"github.com/foomo/posh/pkg/readline"
 )
 
@@ -30,8 +30,8 @@ func NewPrint(l log.Logger) *Print {
 				{
 					Name:   "message",
 					Repeat: false,
-					Suggest: func(ctx context.Context, t *tree.Root, r *readline.Readline) []prompt.Suggest {
-						return []prompt.Suggest{
+					Suggest: func(ctx context.Context, t *tree.Root, r *readline.Readline) []goprompt.Suggest {
+						return []goprompt.Suggest{
 							{Text: "hello world"},
 						}
 					},
@@ -58,15 +58,15 @@ func (c *Print) Description() string {
 	return c.commandTree.Description
 }
 
-func (c *Print) Complete(ctx context.Context, r *readline.Readline, d prompt.Document) []prompt.Suggest {
-	return c.commandTree.RunCompletion(ctx, r)
+func (c *Print) Complete(ctx context.Context, r *readline.Readline, d goprompt.Document) []goprompt.Suggest {
+	return c.commandTree.Complete(ctx, r)
 }
 
 func (c *Print) Execute(ctx context.Context, r *readline.Readline) error {
-	return c.commandTree.RunExecution(ctx, r)
+	return c.commandTree.Execute(ctx, r)
 }
 
-func (c *Print) Help() string {
+func (c *Print) Help(ctx context.Context, r *readline.Readline) string {
 	return `Print a message
 
 Usage:

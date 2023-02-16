@@ -20,7 +20,6 @@ import (
 	"github.com/foomo/posh/pkg/prompt/history"
 	"github.com/foomo/posh/pkg/readline"
 	"github.com/foomo/posh/pkg/require"
-	"github.com/spf13/viper"
 )
 
 type Plugin struct {
@@ -61,7 +60,7 @@ func New(l log.Logger) (plugin.Plugin, error) {
 	}
 
 	// 1Password
-	if onePassword, err := onepassword.New(l, inst.c, onepassword.WithTokenFilename(viper.GetString("onePassword.tokenFilename"))); err != nil {
+	if onePassword, err := onepassword.New(l, inst.c); err != nil {
 		return nil, err
 	} else if cmd, err := onepassword.NewCommand(l, onePassword); err != nil {
 		return nil, err
