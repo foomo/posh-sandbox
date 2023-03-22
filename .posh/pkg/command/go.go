@@ -6,7 +6,6 @@ import (
 	"path"
 	"strings"
 
-	prompt2 "github.com/c-bata/go-prompt"
 	"github.com/foomo/posh/pkg/cache"
 	"github.com/foomo/posh/pkg/command/tree"
 	"github.com/foomo/posh/pkg/log"
@@ -21,7 +20,7 @@ import (
 type Go struct {
 	l           log.Logger
 	cache       cache.Namespace
-	commandTree *tree.Root
+	commandTree tree.Root
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -38,7 +37,7 @@ func NewGo(l log.Logger, cache cache.Cache) *Go {
 	pathModArg := &tree.Arg{
 		Name:     "path",
 		Optional: true,
-		Suggest: func(ctx context.Context, p *tree.Root, r *readline.Readline) []prompt2.Suggest {
+		Suggest: func(ctx context.Context, p tree.Root, r *readline.Readline) []goprompt.Suggest {
 			return inst.completePaths(ctx, "go.mod")
 		},
 	}
@@ -46,12 +45,12 @@ func NewGo(l log.Logger, cache cache.Cache) *Go {
 	pathGenerateArg := &tree.Arg{
 		Name:     "path",
 		Optional: true,
-		Suggest: func(ctx context.Context, p *tree.Root, r *readline.Readline) []prompt2.Suggest {
+		Suggest: func(ctx context.Context, p tree.Root, r *readline.Readline) []goprompt.Suggest {
 			return inst.completePaths(ctx, "generate.go")
 		},
 	}
 
-	inst.commandTree = &tree.Root{
+	inst.commandTree = tree.New(&tree.Node{
 		Name:        "go",
 		Description: "go related tasks",
 		Nodes: tree.Nodes{
@@ -108,7 +107,7 @@ func NewGo(l log.Logger, cache cache.Cache) *Go {
 				Execute:     inst.generate,
 			},
 		},
-	}
+	})
 	return inst
 }
 
@@ -117,11 +116,11 @@ func NewGo(l log.Logger, cache cache.Cache) *Go {
 // ------------------------------------------------------------------------------------------------
 
 func (c *Go) Name() string {
-	return c.commandTree.Name
+	return c.commandTree.Node().Name
 }
 
 func (c *Go) Description() string {
-	return c.commandTree.Description
+	return c.commandTree.Node().Description
 }
 
 func (c *Go) Complete(ctx context.Context, r *readline.Readline, d goprompt.Document) []goprompt.Suggest {
@@ -133,19 +132,7 @@ func (c *Go) Execute(ctx context.Context, r *readline.Readline) error {
 }
 
 func (c *Go) Help(ctx context.Context, r *readline.Readline) string {
-	return `Looks for go.mod files and runs the given command.
-
-Usage:
-  gomod [command] <path>
-
-Available commands:
-  tidy       run go mod tidy on specific or all paths
-  download   run go mod download on specific or all paths
-  outdated   list outdated packages on specific or all paths
-
-Examples:
-  gomod tidy ./path
-`
+	return c.commandTree.Help(ctx, r)
 }
 
 // ------------------------------------------------------------------------------------------------
