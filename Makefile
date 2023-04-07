@@ -1,20 +1,17 @@
 -include .makerc
 .DEFAULT_GOAL:=help
 
-# --- .makerc -----------------------------------------------------------------
-#
-# level=debug
-
 # --- Config -----------------------------------------------------------------
 
-level?=info
+POSH_PATH?=.posh
+POSH_LEVEL?=info
 
 # --- Helpers -----------------------------------------------------------------
 
 .PHONY: bin/posh
 # Builds posh and takes the git hash to detect changes
-bin/posh: current=$(shell bin/posh version)
-bin/posh: version=$(shell git ls-files -s .posh/pkg | git hash-object --stdin)
+bin/posh: current=$(shell test -f bin/posh && bin/posh version || echo '')
+bin/posh: version=$(shell git ls-files -s .posh | git hash-object --stdin)
 bin/posh: commitHash=$(shell git rev-parse HEAD)
 bin/posh: buildTimestamp=$(shell date +%s)
 bin/posh: ldflags=\
@@ -23,7 +20,8 @@ bin/posh: ldflags=\
 	-X github.com/foomo/posh/internal/version.BuildTimestamp=${buildTimestamp}
 bin/posh:
 	@if [ "${current}" != "${version}" ]; then \
-  	cd .posh && go mod tidy && go build -trimpath -ldflags="${ldflags}" -o ../bin/posh main.go; \
+  	echo "rebuilding shell ('${current}' != '${version}')" && \
+  	cd ${POSH_PATH} && go mod tidy && go build -trimpath -ldflags="${ldflags}" -o "../bin/posh" main.go; \
   fi
 
 # --- Targets -----------------------------------------------------------------
@@ -36,26 +34,30 @@ clean:
 .PHONY: config
 ## Print posh config
 config: bin/posh
-	@bin/posh config --level ${level}
+	@bin/posh config --level ${POSH_LEVEL}
 
 .PHONY: brew
 ## Install project specific packages
 brew: bin/posh
-	@bin/posh brew --level ${level}
+	@bin/posh brew --level ${POSH_LEVEL}
 
 .PHONY: require
 ## Validate dependencies
 require: bin/posh
-	@bin/posh require --level ${level}
+	@bin/posh require --level ${POSH_LEVEL}
 
 .PHONY: shell
-## Start the interactive
-shell: bin/posh require brew
-	@bin/posh prompt --level ${level}
+## Start the interactive project shell
+shell: require brew
+	@bin/posh prompt --level ${POSH_LEVEL}
+
+.PHONY: shell.build
+## Build the interactive project shell
+shell.build: clean bin/posh
 
 .PHONY: shell.rebuild
-## Rebuild and start the interactive
-shell.rebuild: clean shell
+## Build and start the interactive project shell
+shell.rebuild: shell.build shell
 
 ## === Utils ===
 

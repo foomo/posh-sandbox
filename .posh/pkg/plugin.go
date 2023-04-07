@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/foomo/posh-providers/dreadl0ck/zeus"
+	"github.com/foomo/posh-providers/facebook/docusaurus"
 	"github.com/foomo/posh-providers/foomo/gotsrpc"
 	"github.com/foomo/posh-providers/onepassword"
 	pkgcommand "github.com/foomo/posh-sandbox/posh/pkg/command"
@@ -39,34 +40,28 @@ func New(l log.Logger) (plugin.Plugin, error) {
 		commands: command.Commands{},
 	}
 
+	// 1Password
+	onePassword, err := onepassword.New(l, inst.c)
+	if err != nil {
+		return nil, err
+	}
+
 	// add commands
-	inst.commands.Add(
-		gotsrpc.NewCommand(l, inst.c),
-		zeus.NewCommand(l, inst.c),
-		pkgcommand.NewGo(l, inst.c),
-		pkgcommand.NewPrint(l),
-		command.NewCache(l, inst.c),
-		command.NewExit(l),
-		command.NewHelp(l, inst.commands),
-	)
+	inst.commands.Add(gotsrpc.NewCommand(l, inst.c))
+	inst.commands.Add(zeus.NewCommand(l, inst.c))
+	inst.commands.Add(pkgcommand.NewGo(l, inst.c))
+	inst.commands.Add(pkgcommand.NewPrint(l))
+	inst.commands.Add(command.NewCache(l, inst.c))
+	inst.commands.Add(command.NewExit(l))
+	inst.commands.Add(command.NewHelp(l, inst.commands))
+	inst.commands.MustAdd(docusaurus.NewCommand(l))
 
 	// Welcome
-	if cmd, err := pkgcommand.NewWelcome(l,
+	inst.commands.MustAdd(pkgcommand.NewWelcome(l,
 		pkgcommand.WelcomeWithConfigKey("welcome"),
-	); err != nil {
-		return nil, err
-	} else {
-		inst.commands.Add(cmd)
-	}
+	))
 
-	// 1Password
-	if onePassword, err := onepassword.New(l, inst.c); err != nil {
-		return nil, err
-	} else if cmd, err := onepassword.NewCommand(l, onePassword); err != nil {
-		return nil, err
-	} else {
-		inst.commands.Add(cmd)
-	}
+	inst.commands.MustAdd(onepassword.NewCommand(l, onePassword))
 	return inst, nil
 }
 

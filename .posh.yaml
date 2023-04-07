@@ -173,3 +173,14 @@ onePassword:
 ## Example: Custom
 welcome:
   message: Hi, thanks for using posh!
+
+## Example: Docusaurus
+docusaurus:
+  sourcePath: .posh/docs
+  imageName: docusaurus
+  imageTag: posh-sanbox
+  nodeTag: 18-alpine
+  localPort: 3000
+  volumes:
+    - ${PROJECT_ROOT}:/docusaurus/docs
+    - ${PROJECT_ROOT}/.posh/docs/docusaurus.config.js:/docusaurus/docusaurus.config.js

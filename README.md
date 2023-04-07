@@ -1,6 +1,6 @@
-# Project Oriented SHELL (posh) Sandbox
+# POSH
 
-Demo and testing project.
+> Welcome to the Project Oriented SHELL (posh) Sandbox
 
 ## Usage
 
