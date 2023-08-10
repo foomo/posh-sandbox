@@ -86,11 +86,11 @@ func (p *Plugin) Brew(ctx context.Context, cfg config.Ownbrew) error {
 }
 
 func (p *Plugin) Require(ctx context.Context, cfg config.Require) error {
-	return require.First(p.l,
+	return require.First(ctx, p.l,
 		require.Envs(p.l, cfg.Envs),
-		require.Packages(ctx, p.l, cfg.Packages),
-		require.Scripts(ctx, p.l, cfg.Scripts),
-		require.GitUser(ctx, p.l, require.GitUserName, require.GitUserEmail(`(.*)@(bestbytes\.com)`)),
+		require.Packages(p.l, cfg.Packages),
+		require.Scripts(p.l, cfg.Scripts),
+		require.GitUser(p.l, require.GitUserName, require.GitUserEmail(`(.*)@(bestbytes\.com)`)),
 	)
 }
 
