@@ -1,3 +1,3 @@
 module github.com/foomo/posh-sandbox
 
-go 1.19
+go 1.20
