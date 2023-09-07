@@ -42,6 +42,9 @@ ownbrew:
     - name: zeus
       tap: foomo/tap/dreadl0ck/zeus
       version: 0.9.11
+    - name: krr
+      tap: foomo/tap/robusta-dev/krr
+      version: 1.6.0
 
 ## Requirement settings
 require:
