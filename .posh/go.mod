@@ -5,15 +5,15 @@ go 1.20
 replace github.com/c-bata/go-prompt v0.2.6 => github.com/franklinkim/go-prompt v0.2.7-0.20210427061716-a8f4995d7aa5
 
 require (
-	github.com/foomo/posh v0.4.5
-	github.com/foomo/posh-providers v0.3.6
+	github.com/foomo/posh v0.4.7
+	github.com/foomo/posh-providers v0.3.7
 	github.com/spf13/viper v1.16.0
 )
 
 require (
 	atomicgo.dev/cursor v0.2.0 // indirect
 	atomicgo.dev/keyboard v0.2.9 // indirect
-	atomicgo.dev/schedule v0.0.2 // indirect
+	atomicgo.dev/schedule v0.1.0 // indirect
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/1Password/connect-sdk-go v1.5.3 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
@@ -40,7 +40,7 @@ require (
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gookit/color v1.5.3 // indirect
+	github.com/gookit/color v1.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
@@ -63,7 +63,7 @@ require (
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/term v1.1.0 // indirect
-	github.com/pterm/pterm v0.12.65 // indirect
+	github.com/pterm/pterm v0.12.67 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/samber/lo v1.38.1 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
