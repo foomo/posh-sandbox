@@ -46,7 +46,7 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: 'posh-sandbox/${{ matrix.gomod }}/go.mod'
-      - uses: golangci/golangci-lint-action@v3
+      - uses: golangci/golangci-lint-action@v9
         with:
           working-directory: posh-sandbox/${{ matrix.gomod }}
       - run: go test -v ./...
